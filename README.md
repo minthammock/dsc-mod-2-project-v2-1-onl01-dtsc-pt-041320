@@ -23,7 +23,7 @@
         <p>
             This repository contains the following folders and files:
             <br>
-            &nbsp • mod2.ipyn
+            <&nbsp> • mod2.ipyn
             <br>
             &nbsp &nbsp • The jupyter notebook containing all relavant data analysis, figures and conclusions of the mod 2 project
             <br>
