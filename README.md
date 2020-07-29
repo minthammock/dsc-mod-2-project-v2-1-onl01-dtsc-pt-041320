@@ -11,11 +11,12 @@
             The Module 2 final project is an analysis and of the King County housing data set. The purpose of this analysis was to answer
             the following questions:
             <br>
-            <strong>• This is going to be question 1</strong>
             <br>
-            <strong>• This is going to be question 2</strong>
+                <strong>• This is going to be question 1</strong>
             <br>
-            <strong>• This is going to be question 3</strong>
+                <strong>• This is going to be question 2</strong>
+            <br>
+                <strong>• This is going to be question 3</strong>
             <br>
             The project was tackled using the OSIM data science framework with specific methodology that will be spelled out farther down on this page. This cover page will serve as a resource for navigating this repository and to provide context for the devices used in the jupyter notebook. 
         </p>
@@ -23,21 +24,21 @@
         <p>
             This repository contains the following folders and files:
             <br>
-            <&nbsp> • mod2.ipyn
+                • mod2.ipyn
             <br>
-            &nbsp &nbsp • The jupyter notebook containing all relavant data analysis, figures and conclusions of the mod 2 project
+                    • The jupyter notebook containing all relavant data analysis, figures and conclusions of the mod 2 project
             <br>
-            &nbsp • kc_house_data.csv
+                • kc_house_data.csv
             <br>
-            &nbsp &nbsp • A comma seperated value file containing all the data used in the mod 2 project
+                    • A comma seperated value file containing all the data used in the mod 2 project
             <br>
-            &nbsp • column_names.md
+                • column_names.md
             <br>
-            &nbsp &nbsp • A markdown file containing the column schema for the kc_house_data.csv file
+                    • A markdown file containing the column schema for the kc_house_data.csv file
             <br>
-            &nbsp • LICENCE.md
+                • LICENCE.md
             <br>
-            &nbsp &nbsp • The markdown file containing the usage and licencing details of all the information contained in this repository.
+                    • The markdown file containing the usage and licencing details of all the information contained in this repository.
         </p>
         <h2>Notes and conventions</h2>
         <p>
