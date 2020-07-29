@@ -12,11 +12,11 @@
             the following questions:
             <br>
             <br>
-                <strong>• This is going to be question 1</strong>
+                \t <strong>• This is going to be question 1</strong>
             <br>
-                <strong>• This is going to be question 2</strong>
+                \t<strong>• This is going to be question 2</strong>
             <br>
-                <strong>• This is going to be question 3</strong>
+                \t<strong>• This is going to be question 3</strong>
             <br>
             The project was tackled using the OSIM data science framework with specific methodology that will be spelled out farther down on this page. This cover page will serve as a resource for navigating this repository and to provide context for the devices used in the jupyter notebook. 
         </p>
@@ -24,19 +24,19 @@
         <p>
             This repository contains the following folders and files:
             <br>
-                • mod2.ipyn
+                \t• mod2.ipyn
             <br>
-                    • The jupyter notebook containing all relavant data analysis, figures and conclusions of the mod 2 project
+                    \t• The jupyter notebook containing all relavant data analysis, figures and conclusions of the mod 2 project
             <br>
-                • kc_house_data.csv
+                \t• kc_house_data.csv
             <br>
-                    • A comma seperated value file containing all the data used in the mod 2 project
+                    \t• A comma seperated value file containing all the data used in the mod 2 project
             <br>
-                • column_names.md
+               \t • column_names.md
             <br>
-                    • A markdown file containing the column schema for the kc_house_data.csv file
+                    \t• A markdown file containing the column schema for the kc_house_data.csv file
             <br>
-                • LICENCE.md
+                \t• LICENCE.md
             <br>
                     • The markdown file containing the usage and licencing details of all the information contained in this repository.
         </p>
