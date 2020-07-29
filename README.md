@@ -12,11 +12,11 @@
             the following questions:
             <br>
             <br>
-                &nbsp <strong>• This is going to be question 1</strong>
+             <strong>• This is going to be question 1</strong>
             <br>
-                \t<strong>• This is going to be question 2</strong>
+             <strong>• This is going to be question 2</strong>
             <br>
-                \t<strong>• This is going to be question 3</strong>
+             <strong>• This is going to be question 3</strong>
             <br>
             The project was tackled using the OSIM data science framework with specific methodology that will be spelled out farther down on this page. This cover page will serve as a resource for navigating this repository and to provide context for the devices used in the jupyter notebook. 
         </p>
@@ -24,25 +24,33 @@
         <p>
             This repository contains the following folders and files:
             <br>
-                \t• mod2.ipyn
+                • mod2.ipyn
             <br>
-                    \t• The jupyter notebook containing all relavant data analysis, figures and conclusions of the mod 2 project
+                    • The jupyter notebook containing all relavant data analysis, figures and conclusions of the mod 2 project
             <br>
-                \t• kc_house_data.csv
+                • kc_house_data.csv
             <br>
-                    \t• A comma seperated value file containing all the data used in the mod 2 project
+                    • A comma seperated value file containing all the data used in the mod 2 project
             <br>
-               \t • column_names.md
+                • column_names.md
             <br>
-                    \t• A markdown file containing the column schema for the kc_house_data.csv file
+                    • A markdown file containing the column schema for the kc_house_data.csv file
             <br>
-                \t• LICENCE.md
+                • LICENCE.md
             <br>
                     • The markdown file containing the usage and licencing details of all the information contained in this repository.
+            <br>
+                • scripts.py
+            <br>
+                    • A python file containing the source code for all custom functions used in this project.
         </p>
         <h2>Notes and conventions</h2>
         <p>
+                All custom functions that are used in the defined in the scripts.py file. They will have an inline comment associated with them in the mod2.ipyn declairing they are a custom function. Custom function will all have doc strings and explaining their use cases, parameters, special methodology (if used) and return values. The function definitions were omitted from the mod2.ipyn for readability purposes. 
+        <br>
             
-        </p>
-    </body>
+            
+               
+        </p>    
+    
     
