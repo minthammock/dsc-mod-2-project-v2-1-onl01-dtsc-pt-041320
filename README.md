@@ -12,7 +12,7 @@
             the following questions:
             <br>
             <br>
-                \t <strong>• This is going to be question 1</strong>
+                &nbsp <strong>• This is going to be question 1</strong>
             <br>
                 \t<strong>• This is going to be question 2</strong>
             <br>
