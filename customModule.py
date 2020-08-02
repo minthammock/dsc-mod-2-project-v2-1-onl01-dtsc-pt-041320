@@ -55,44 +55,42 @@ def fillNull(df, columns, numericalData = True, naive = True, showInfo = False):
                 display(f'The mean of column {x} = {fillIn}')
                 display(df[x].value_counts())
 
-def dropNumericOutliers(df, dropThreshold = .05):
+def dropNumericOutliers(df, stdRange = 3, outliersPerRow = 1):
     '''
         This function takes in a pandas dataframe and operates on the numerical data columns to remove column outliers
         that lie more than three standard deviations away from the column mean. Note that the outliers are removed at the dataframe
         so there is a potential to exclude a large percentage of data if the row indecies don't overlap for the extream values in each column
     '''
-    # outlierIndicies = []
     try:
-        dfNumeric = df.select_dtypes(['int64','float64']).drop(columns = 'id')
+        dfNumeric = df.select_dtypes('number').drop(columns = 'id').copy()
     except:
-        dfNumeric = df.select_dtypes(['int64','float64'])
+        dfNumeric = df.select_dtypes('number').copy()
         print('id column was not detected and was not dropped')
-    indeciesRemoved = {}
+    indiciesRemoved = []
     for x in dfNumeric.columns:
         mean = dfNumeric[x].mean()
         std = dfNumeric[x].std()
-        outliers = dfNumeric[x].loc[(dfNumeric[x] < mean - 3*std) | (dfNumeric[x] > mean + 3*std)]
-        numberCanRemove = math.floor(dropThreshold*dfNumeric.shape[0])
-        # print(numberCanRemove)
-        numberRemoved = 0
-        # print(numberRemoved)
-        # print(outliers)
-        for y in outliers:
-            indeciesRemoved[x] = []
-            while numberRemoved <= numberCanRemove:
-                currentMax = outliers.loc[outliers == outliers.max()]
-                maxIndecies = list(currentMax.index)
-                currentMin = outliers.loc[outliers == outliers.min()]
-                minIndecies = list(currentMin.index)
-                # print(currentMax, currentMin)
-                outliers.drop(index = minIndecies + maxIndecies, inplace = True)
-                indeciesRemoved[x].append(minIndecies)
-                indeciesRemoved[x].append(maxIndecies)
-                numberRemoved += len(maxIndecies)+len(minIndecies)
-                if outliers.empty == True:
-                    break
-    print(pd.DataFrame.from_dict(indeciesRemoved))
+        outliers = dfNumeric[x].loc[(dfNumeric[x] < mean - stdRange*std) | (dfNumeric[x] > mean + stdRange*std)].copy()
+        for y in outliers.index:
+            indiciesRemoved.append(y)
+        # numberCanRemove = math.floor(dropThreshold*dfNumeric.shape[0])
+        # numberRemoved = 0
+        
 
+    # print(indiciesRemoved)
+    dictionaryOfIndiceies = {}
+    for x in indiciesRemoved:
+        dictionaryOfIndiceies[x] = dictionaryOfIndiceies.get(x, 0) + 1
+
+    
+        
+    # display(dictionaryOfIndiceies) 
+    dropIndex = []
+    for key,value in dictionaryOfIndiceies.items():
+        if value > outliersPerRow:
+            dropIndex.append(key)
+    print(f'The input parameters caused a {round(len(dropIndex)/df.shape[0]*100,2)}% drop of the total rows.')
+    df = df.drop(index = dropIndex)
     return df
 
 def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFeatures = False):
@@ -147,7 +145,7 @@ def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFe
     # Begin the loop to remove columns
     while removeFeatures == True:
         # Push any columns with insignificant pvalues from the previous iteration into the pending bucket
-        badP = model.pvalues[tempFeatures].loc[model.pvalues > .05]
+        badP = model.pvalues[tempFeatures].loc[model.pvalues > pThreshold]
         if len(badP) > 0:
             print(f'The following columns have p-values above the threshold of {pThreshold}: {list(badP.index)}\n')
             for x in list(badP.index):
@@ -194,7 +192,7 @@ def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFe
           break
 
     # one last check to make sure that there aren't any insignificant pvalues in our model
-    badP = model.pvalues[tempFeatures+succeededCols].loc[model.pvalues > .05]
+    badP = model.pvalues[tempFeatures+succeededCols].loc[model.pvalues > pThreshold]
     while len(badP) > 0:
         print(f'The following columns have p-values above the threshold of {pThreshold}: {list(badP.index)}\n')
         for x in badP.index:
@@ -209,6 +207,6 @@ def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFe
         X = sm.add_constant(X)
         model = sm.OLS(endog = Y, exog = X).fit()
         R = model.rsquared
-        badP = model.pvalues[tempFeatures+succeededCols].loc[model.pvalues > .05]
+        badP = model.pvalues[tempFeatures+succeededCols].loc[model.pvalues > pThreshold]
 
     return model, removedCols
