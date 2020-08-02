@@ -1,6 +1,9 @@
 #Python file containing all custom functions used in the mod2.ipyn file
 import statsmodels.api as sm
 import numpy as np
+import pandas as pd
+import math
+
 def fillNull(df, columns, numericalData = True, naive = True, showInfo = False):
     '''
         This function takes in a DataFrame and column names of the DataFrame which 
@@ -52,36 +55,49 @@ def fillNull(df, columns, numericalData = True, naive = True, showInfo = False):
                 display(f'The mean of column {x} = {fillIn}')
                 display(df[x].value_counts())
 
-def dropNumericOutliers(df):
+def dropNumericOutliers(df, dropThreshold = .05):
     '''
         This function takes in a pandas dataframe and operates on the numerical data columns to remove column outliers
         that lie more than three standard deviations away from the column mean. Note that the outliers are removed at the dataframe
         so there is a potential to exclude a large percentage of data if the row indecies don't overlap for the extream values in each column
     '''
-    outlierIndicies = []
+    # outlierIndicies = []
     try:
         dfNumeric = df.select_dtypes(['int64','float64']).drop(columns = 'id')
     except:
         dfNumeric = df.select_dtypes(['int64','float64'])
+        print('id column was not detected and was not dropped')
+    indeciesRemoved = {}
     for x in dfNumeric.columns:
         mean = dfNumeric[x].mean()
         std = dfNumeric[x].std()
-        indecies = dfNumeric.loc[(dfNumeric[x] < mean - 3*std) | (dfNumeric[x] > mean + 3*std)].index
-        print(indecies)
-        for index in indecies:
-            if index in outlierIndicies:
-                pass
-            else:
-                outlierIndicies.append(index)
-    print(outlierIndicies)
-    print('\n')
-    print(f'Combined all the outliers make up {dfNumeric.shape[0]/len(outlierIndicies)}% of the data')
-    
-    return df.drop(index = outlierIndicies)
+        outliers = dfNumeric[x].loc[(dfNumeric[x] < mean - 3*std) | (dfNumeric[x] > mean + 3*std)]
+        numberCanRemove = math.floor(dropThreshold*dfNumeric.shape[0])
+        # print(numberCanRemove)
+        numberRemoved = 0
+        # print(numberRemoved)
+        # print(outliers)
+        for y in outliers:
+            indeciesRemoved[x] = []
+            while numberRemoved <= numberCanRemove:
+                currentMax = outliers.loc[outliers == outliers.max()]
+                maxIndecies = list(currentMax.index)
+                currentMin = outliers.loc[outliers == outliers.min()]
+                minIndecies = list(currentMin.index)
+                # print(currentMax, currentMin)
+                outliers.drop(index = minIndecies + maxIndecies, inplace = True)
+                indeciesRemoved[x].append(minIndecies)
+                indeciesRemoved[x].append(maxIndecies)
+                numberRemoved += len(maxIndecies)+len(minIndecies)
+                if outliers.empty == True:
+                    break
+    print(pd.DataFrame.from_dict(indeciesRemoved))
 
-def removeFeatures(df,features, target, rThreshold = .8, pThreshold = .05):
+    return df
+
+def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFeatures = False):
     '''
-        The removeFeatures function takes in a dataframe with lists of features and target variables. The function creates a linear regression
+        The reduceModel function takes in a dataframe with lists of features and target variables. The function creates a linear regression
         model and subsequently performs a step-by-step removal of features from the original model until the point at which removing any additional
         will result is a degredation of the model below the desired R_squared value. Features are removed on a basis of the magnitude of their
         linear coefficients. After the feature is removed, the model is run again to confirm the integrity of the model. In the event that removing 
@@ -129,7 +145,7 @@ def removeFeatures(df,features, target, rThreshold = .8, pThreshold = .05):
     print('\n')
 
     # Begin the loop to remove columns
-    while True:
+    while removeFeatures == True:
         # Push any columns with insignificant pvalues from the previous iteration into the pending bucket
         badP = model.pvalues[tempFeatures].loc[model.pvalues > .05]
         if len(badP) > 0:
@@ -160,6 +176,7 @@ def removeFeatures(df,features, target, rThreshold = .8, pThreshold = .05):
         if( R < rThreshold) & (len(pendingCols) > 0):
             print(f'''The R-squared value has dropped to {R} which is below the acceptable threshold of {rThreshold}. Adding feature: {pendingCols[-1]} back into the model and continuing \n\n\n''')
             succeededCols.append(pendingCols.pop())
+            pendingCols = []
             # Run the model again having added in the last column pushed into the pending bucket. 
             Y = df[target]
             X = df[tempFeatures+succeededCols]
@@ -175,6 +192,23 @@ def removeFeatures(df,features, target, rThreshold = .8, pThreshold = .05):
         # When all columns have been sorted into the removed bucket or succeeded bucket we will the loop
         if len(tempFeatures) == 0:
           break
-                
+
+    # one last check to make sure that there aren't any insignificant pvalues in our model
+    badP = model.pvalues[tempFeatures+succeededCols].loc[model.pvalues > .05]
+    while len(badP) > 0:
+        print(f'The following columns have p-values above the threshold of {pThreshold}: {list(badP.index)}\n')
+        for x in badP.index:
+            if removeFeatures == False:
+                tempFeatures.remove(x)
+                removedCols.append(x)
+            else:
+                tempFeatures+succeededCols.remove(x)
+                removedCols.append(x)
+        Y = df[target]
+        X = df[succeededCols+tempFeatures]
+        X = sm.add_constant(X)
+        model = sm.OLS(endog = Y, exog = X).fit()
+        R = model.rsquared
+        badP = model.pvalues[tempFeatures+succeededCols].loc[model.pvalues > .05]
 
     return model, removedCols
