@@ -37,11 +37,11 @@ def fillNull(df, columns, numericalData = True, naive = True, showInfo = False):
     # for numerical data we use the mean to replace the null values
     if numericalData == True:
         for x in columns:
-            fillIn = df[x].mean()
+            fillIn = df[x].median()
             df[x] = df[x].fillna(fillIn)
             if showInfo == True:
                 display(f'Column {x} now has {df[x].isna().sum()} null values')
-                display(f'The mean of column {x} = {fillIn}')
+                display(f'The median of column {x} = {fillIn}')
                 display(df[x].value_counts())
     # For categorical data we fill in the string 'Null'
     else:
@@ -52,7 +52,7 @@ def fillNull(df, columns, numericalData = True, naive = True, showInfo = False):
             df[x] = df[x].astype('category')
             if showInfo == True:
                 display(f'Column {x} now has {df[x].isna().sum()} null values')
-                display(f'The mean of column {x} = {fillIn}')
+                display(f'The median of column {x} = {fillIn}')
                 display(df[x].value_counts())
 
 def dropNumericOutliers(df, stdRange = 3, outliersPerRow = 1):
