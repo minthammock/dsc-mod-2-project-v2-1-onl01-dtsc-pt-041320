@@ -93,14 +93,19 @@ def dropNumericOutliers(df, stdRange = 3, outliersPerRow = 1):
     df = df.drop(index = dropIndex)
     return df
 
-def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFeatures = False):
+def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFeatures = False, addConstant = True):
     '''
-        The reduceModel function takes in a dataframe with lists of features and target variables. The function creates a linear regression
-        model and subsequently performs a step-by-step removal of features from the original model until the point at which removing any additional
-        will result is a degredation of the model below the desired R_squared value. Features are removed on a basis of the magnitude of their
-        linear coefficients. After the feature is removed, the model is run again to confirm the integrity of the model. In the event that removing 
-        a feature increases the p-values of other columns due to marginal coolinearity, those columns will be removed in addition to the feature with
-        the least impactful coefficient.  Should the model fall below the quality threshold, the last removed feature is re-added to the 
+        The reduceModel function takes in a dataframe with lists of features and
+        target variables. The function creates a linear regression model and subsequently 
+        performs a step-by-step removal of features from the original model until 
+        the point at which removing any additional will result is a degredation 
+        of the model below the desired R_squared value. Features are removed on 
+        a basis of the magnitude of their linear coefficients. After the feature 
+        is removed, the model is run again to confirm the integrity of the model.
+        In the event that removing a feature increases the p-values of other columns 
+        due to marginal coolinearity, those columns will be removed in addition to 
+        the feature with the least impactful coefficient.  Should the model fall 
+        below the quality threshold, the last removed feature is re-added to the 
         model but excluded from the list of feature eliagable for removal.
 
         Parameter:
@@ -136,7 +141,8 @@ def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFe
     # Run the first model to establish an entry point into the loop
     Y = df[target]
     X = df[tempFeatures]
-    X = sm.add_constant(X)
+    if addConstant == True:
+        X = sm.add_constant(X)
     model = sm.OLS(endog = Y, exog = X).fit()
     R = model.rsquared
     print(f' The starting R-value for the model is {R}')
@@ -164,7 +170,8 @@ def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFe
         #Run the model again with the tempFeatures and succeded bucket. 
         Y = df[target]
         X = df[tempFeatures+succeededCols]
-        X = sm.add_constant(X)
+        if addConstant == True:
+            X = sm.add_constant(X)
         model = sm.OLS(endog = Y, exog = X).fit()
         R = model.rsquared
         
@@ -178,7 +185,8 @@ def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFe
             # Run the model again having added in the last column pushed into the pending bucket. 
             Y = df[target]
             X = df[tempFeatures+succeededCols]
-            X = sm.add_constant(X)
+            if addConstant == True:
+                X = sm.add_constant(X)
             model = sm.OLS(endog = Y, exog = X).fit()
             R = model.rsquared
         
@@ -204,7 +212,8 @@ def reduceModel(df,features, target, rThreshold = .8, pThreshold = .05, removeFe
                 removedCols.append(x)
         Y = df[target]
         X = df[succeededCols+tempFeatures]
-        X = sm.add_constant(X)
+        if addConstant == True:
+            X = sm.add_constant(X)
         model = sm.OLS(endog = Y, exog = X).fit()
         R = model.rsquared
         badP = model.pvalues[tempFeatures+succeededCols].loc[model.pvalues > pThreshold]
